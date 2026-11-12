@@ -1,4 +1,4 @@
-# DataVerse AI Academy: vertical slice
+# Excellent AI Academy: vertical slice
 
 **Implemented (real, tested):** register/login (JWT, PBKDF2), catalog for all 4 tracks (module titles from the brief),
 Data Analytics Module 4 lesson with source links, SQL lab with 3 tasks graded deterministically against hidden reference
