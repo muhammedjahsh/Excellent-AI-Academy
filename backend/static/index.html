@@ -1,0 +1,11 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>DataVerse AI Academy</title>
+<style>body{font:16px system-ui;max-width:760px;margin:2rem auto;padding:0 1rem}textarea,input{width:100%;box-sizing:border-box;margin:.3rem 0;padding:.5rem}button{padding:.5rem 1rem}pre{background:#8881;padding:.7rem;overflow:auto}</style>
+<h1>Excellent  AI Academy</h1><div id=t></div><h2>Account</h2>
+<input id=e placeholder=email><input id=n placeholder=name><input id=p type=password placeholder="password (8+)">
+<button onclick="auth('register')">Register</button> <button onclick="auth('login')">Login</button>
+<h2>SQL Lab</h2><select id=k></select><p id=q></p><textarea id=s rows=4 placeholder="SELECT ..."></textarea>
+<button onclick=sub()>Submit</button><pre id=o></pre>
+<script>let T='';const j=async(u,o={})=>(await fetch(u,{...o,headers:{'Content-Type':'application/json',...(T&&{Authorization:'Bearer '+T})}})).json();
+j('/tracks').then(r=>t.innerHTML=r.map(x=>`<b>${x.title}</b> (${x.modules} modules)`).join('<br>'));
+async function auth(a){const r=await j('/auth/'+a,{method:'POST',body:JSON.stringify({email:e.value,name:n.value,password:p.value})});if(r.token){T=r.token;o.textContent='Signed in';const ts=await j('/labs/tasks');k.innerHTML=ts.map(x=>`<option value=${x.id} data-p="${x.prompt}">${x.id}</option>`).join('');k.onchange=()=>q.textContent=k.selectedOptions[0].dataset.p;k.onchange()}else o.textContent=JSON.stringify(r)}
+async function sub(){o.textContent=JSON.stringify(await j('/labs/sql/submit',{method:'POST',body:JSON.stringify({task_id:k.value,query:s.value})}),null,1)}</script>
