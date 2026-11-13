@@ -1,23 +1,34 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { getTrack } from "../data/curriculum";
 import { useAcademy } from "../context/AcademyContext";
 import CommandPalette from "./CommandPalette";
+import Icon from "./Icon";
 import Mark from "./Mark";
 
-const LINKS = [
-  { to: "/tracks", label: "Courses" },
-  { to: "/lab", label: "SQL lab" },
-  { to: "/studio", label: "Developer studio" },
-  { to: "/agents", label: "Agent studio" },
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/certificates", label: "Records" },
-];
-
 export default function Shell() {
-  const { user, online, logout } = useAcademy();
+  const { user, online, logout, activeCourse } = useAcademy();
   const [open, setOpen] = useState(false);
   const [palette, setPalette] = useState(false);
   const location = useLocation();
+  const track = getTrack(activeCourse);
+  const links = track
+    ? [
+        { to: `/tracks/${track.slug}`, label: "My course", icon: "course" },
+        { to: "/tracks", label: "Switch course", icon: "switch" },
+        ...(track.slug === "data-analytics" ? [{ to: "/lab", label: "SQL lab", icon: "lab" }] : []),
+        { to: "/studio", label: "Developer studio", icon: "studio" },
+        { to: "/agents", label: "Course AI", icon: "ai" },
+        { to: "/dashboard", label: "My progress", icon: "progress" },
+        { to: "/certificates", label: "Records", icon: "records" },
+        { to: "/checkout", label: "Enroll in courses", icon: "payment" },
+      ]
+    : user?.token
+      ? [
+          { to: "/tracks", label: "Browse courses", icon: "course" },
+          { to: "/checkout", label: "Enroll in courses", icon: "payment" },
+        ]
+      : [{ to: "/tracks", label: "Choose a course", icon: "course" }];
 
   useEffect(() => {
     setOpen(false);
@@ -46,13 +57,14 @@ export default function Shell() {
           </span>
         </NavLink>
         <nav>
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               className={({ isActive }) => (isActive ? "side-link active" : "side-link")}
             >
-              {link.label}
+              <Icon name={link.icon} size={18} />
+              <span>{link.label}</span>
             </NavLink>
           ))}
         </nav>
@@ -64,6 +76,7 @@ export default function Shell() {
           {user ? (
             <>
               <p className="who">{user.name}</p>
+              {track && <p className="side-course-label">Learning: {track.title}</p>}
               <button type="button" className="text-btn" onClick={logout}>
                 Sign out
               </button>
@@ -78,14 +91,23 @@ export default function Shell() {
       {open && <button className="scrim" aria-label="Close menu" onClick={() => setOpen(false)} />}
       <div className="workspace">
         <header className="topbar">
-          <button type="button" className="menu-btn" onClick={() => setOpen(true)} aria-label="Open menu">
+          <button
+            type="button"
+            className="menu-btn"
+            onClick={() => setOpen((value) => !value)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+          >
             <span />
             <span />
           </button>
-          <button type="button" className="jump" onClick={() => setPalette(true)}>
-            Search the academy
-            <kbd>Ctrl K</kbd>
-          </button>
+          <div className="topbar-search">
+            <button type="button" className="jump" onClick={() => setPalette(true)}>
+              <Icon name="search" size={18} />
+              <span>{track ? `Search ${track.title} modules and tools` : "Choose a course to get started"}</span>
+              <kbd>Ctrl K</kbd>
+            </button>
+          </div>
           <NavLink to="/" className="text-btn home-link">
             Home
           </NavLink>
@@ -94,7 +116,7 @@ export default function Shell() {
           <Outlet />
         </main>
       </div>
-      {palette && <CommandPalette onClose={() => setPalette(false)} />}
+      {palette && <CommandPalette activeCourse={activeCourse} onClose={() => setPalette(false)} />}
     </div>
   );
 }

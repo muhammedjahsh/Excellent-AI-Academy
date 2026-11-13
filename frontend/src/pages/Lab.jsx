@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import DataTable from "../components/DataTable";
 import { TABLES, TASKS } from "../data/lab";
 import { useAcademy } from "../context/AcademyContext";
+import { getTrack } from "../data/curriculum";
 import { useTitle } from "../hooks/useTitle";
 import * as api from "../lib/api";
 
@@ -11,8 +12,9 @@ async function studio() {
 }
 
 export default function Lab() {
-  useTitle("SQL lab");
-  const { user, addAttempt, online } = useAcademy();
+  const { activeCourse, user, addAttempt, online } = useAcademy();
+  const activeTrack = getTrack(activeCourse);
+  useTitle(activeTrack?.slug === "data-analytics" ? "SQL lab" : activeTrack?.title || "Choose a course");
   const [params, setParams] = useSearchParams();
   const taskId = TASKS.some((task) => task.id === params.get("task")) ? params.get("task") : TASKS[0].id;
   const task = TASKS.find((item) => item.id === taskId);
@@ -75,10 +77,26 @@ export default function Lab() {
     }
   }
 
+  if (!activeTrack || activeTrack.slug !== "data-analytics") {
+    return (
+      <div className="page">
+        <p className="eyebrow">Course-specific tool</p>
+        <h1>This tool isn’t part of your selected course.</h1>
+        <p className="lede">
+          Your workspace only opens tools for your selected course. Switch courses if you want to open this lab.
+        </p>
+        <div className="hero-actions">
+          {activeTrack && <Link to={`/tracks/${activeTrack.slug}`} className="btn btn-ghost">Return to my course</Link>}
+          <Link to="/tracks" className="btn btn-gold">Switch course</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page lab">
       <header className="page-head">
-        <p className="eyebrow">Data Analytics · Module 04</p>
+        <p className="eyebrow">Data Analytics · Module 02</p>
         <h1>SQL lab</h1>
         <p className="lede">
           Run a query to see rows. Submit it to grade. A signed-in session stores the attempt on the academy server when it is live. The browser grader is there so the lab still works on this machine.

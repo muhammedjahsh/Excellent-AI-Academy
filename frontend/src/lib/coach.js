@@ -54,13 +54,13 @@ export function coachReply({ agentId, text, taskId, done, attempts }) {
 
   if (agentId === "herald") {
     const labs = TASKS.filter((item) => passed.has(item.id)).length;
-    const lesson = done["data-analytics-4"] ? "The SQL lesson is marked complete." : "The SQL lesson is still open.";
+    const lesson = done["data-analytics-2"] ? "The SQL lesson is marked complete." : "The SQL lesson is still open.";
     return `${lesson} Lab tasks passed: ${labs} of ${TASKS.length}. A completion record also waits on the modules still in production, plus the capstone, the final interview, and the final assessment. Those are mapped and not open yet, so eligibility stays closed on purpose.`;
   }
 
   const track = getTrack("ai-engineering");
   const next = live;
   return `The next live room is ${next.track.title}, module ${next.n}: ${next.mod.title}. ${
-    done["data-analytics-4"] ? "You already marked that lesson complete, so the lab is the right room." : "Start there, then use Quill on the SQL tasks."
+    done["data-analytics-2"] ? "You already marked that lesson complete, so the lab is the right room." : "Start there, then use Quill on the SQL tasks."
   } ${track.title} holds the Agentic AI module for when you want to build agents, not only study with them. Ask me for a path and I will stay inside what is actually published.`;
 }

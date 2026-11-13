@@ -45,6 +45,22 @@ export function login(body) {
   return request("/auth/login", { method: "POST", body });
 }
 
+export function getBillingCatalog() {
+  return request("/billing/catalog");
+}
+
+export function getEnrollments(token) {
+  return request("/billing/enrollments", { token });
+}
+
+export function createCheckout(token, courses) {
+  return request("/billing/checkout", { token, method: "POST", body: { courses } });
+}
+
+export function getCheckoutStatus(token, sessionId) {
+  return request(`/billing/checkout/${encodeURIComponent(sessionId)}`, { token });
+}
+
 export function submitSql(token, taskId, query) {
   return request("/labs/sql/submit", {
     token,

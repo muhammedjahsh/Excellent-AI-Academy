@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { TRACKS } from "../data/curriculum";
+import { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { getTrack } from "../data/curriculum";
 import { TASKS } from "../data/lab";
 import { useAcademy } from "../context/AcademyContext";
 import { useTitle } from "../hooks/useTitle";
@@ -8,20 +8,16 @@ import * as api from "../lib/api";
 
 export default function Certificates() {
   useTitle("Records");
-  const { done, attempts, online } = useAcademy();
+  const { activeCourse, done, attempts, online } = useAcademy();
+  const track = getTrack(activeCourse);
   const [code, setCode] = useState("");
   const [lookup, setLookup] = useState(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const passed = new Set(attempts.filter((item) => item.passed).map((item) => item.taskId));
 
-  const summary = useMemo(() => {
-    return TRACKS.map((track) => {
-      const waiting = track.modules.filter((mod) => mod.status !== "live").length;
-      const liveDone = track.modules.every((mod, index) => mod.status !== "live" || done[`${track.slug}-${index + 1}`]);
-      return { track, waiting, liveDone };
-    });
-  }, [done]);
+  const waiting = track?.modules.filter((mod) => mod.status !== "live").length || 0;
+  const liveDone = track?.modules.every((mod, index) => mod.status !== "live" || done[`${track.slug}-${index + 1}`]) || false;
 
   async function verify(event) {
     event.preventDefault();
@@ -38,6 +34,8 @@ export default function Certificates() {
     }
   }
 
+  if (!track) return <Navigate to="/tracks" replace />;
+
   return (
     <div className="page">
       <header className="page-head">
@@ -50,28 +48,26 @@ export default function Certificates() {
 
       <div className="cert-grid">
         <section className="stack">
-          {summary.map(({ track, waiting, liveDone }) => (
-            <article key={track.slug} className="panel" data-accent={track.accent}>
-              <div className="track-block-head">
-                <h2>{track.title}</h2>
-                <span className="badge badge-soon">Not eligible</span>
-              </div>
-              <ul className="check-list">
-                <li className={liveDone ? "yes" : ""}>
-                  {track.slug === "data-analytics"
-                    ? "SQL fundamentals marked complete"
-                    : "No live assessment on this track yet"}
+          <article className="panel" data-accent={track.accent}>
+            <div className="track-block-head">
+              <h2>{track.title}</h2>
+              <span className="badge badge-soon">Not eligible</span>
+            </div>
+            <ul className="check-list">
+              <li className={liveDone ? "yes" : ""}>
+                {track.slug === "data-analytics"
+                  ? "SQL fundamentals module marked complete"
+                  : "No live assessment on this course yet"}
+              </li>
+              {track.slug === "data-analytics" && (
+                <li className={passed.size === TASKS.length ? "yes" : ""}>
+                  Lab tasks passed ({passed.size}/{TASKS.length})
                 </li>
-                {track.slug === "data-analytics" && (
-                  <li className={passed.size === TASKS.length ? "yes" : ""}>
-                    Lab tasks passed ({passed.size}/{TASKS.length})
-                  </li>
-                )}
-                <li>{waiting} modules still in production</li>
-                <li>Capstone, final interview, and final assessment are mapped</li>
-              </ul>
-            </article>
-          ))}
+              )}
+              <li>{waiting} modules still in production</li>
+              <li>Capstone, final interview, and final assessment are mapped</li>
+            </ul>
+          </article>
         </section>
         <aside className="panel verify">
           <p className="kicker">Public verify</p>
@@ -100,8 +96,8 @@ export default function Certificates() {
               <p>{lookup.type}</p>
             </div>
           )}
-          <Link to="/agents?agent=herald" className="text-btn">
-            Ask Herald what is still open
+          <Link to="/agents" className="text-btn">
+            Ask {track.assistant.name} about your course
           </Link>
         </aside>
       </div>

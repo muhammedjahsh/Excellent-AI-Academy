@@ -1,11 +1,35 @@
-import { Link } from "react-router-dom";
-import { AGENTS, TRACKS, moduleCount } from "../data/curriculum";
-import { useTitle } from "../hooks/useTitle";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import CourseChooser from "../components/CourseChooser";
+import Icon from "../components/Icon";
 import Mark from "../components/Mark";
+import { useAcademy } from "../context/AcademyContext";
+import { AGENTS, getTrack } from "../data/curriculum";
+import { useTitle } from "../hooks/useTitle";
 
 export default function Home() {
-  useTitle("");
-  const modules = moduleCount();
+  const navigate = useNavigate();
+  const { activeCourse, selectCourse, done, seen } = useAcademy();
+  const track = getTrack(activeCourse);
+  useTitle(track?.title || "Choose a course");
+
+  const completed = track
+    ? track.modules.filter((_, index) => done[`${track.slug}-${index + 1}`]).length
+    : 0;
+  const allComplete = Boolean(track && completed === track.modules.length);
+  const nextIndex = track
+    ? Math.max(0, track.modules.findIndex((_, index) => !done[`${track.slug}-${index + 1}`]))
+    : 0;
+  const nextModule = track?.modules[nextIndex];
+  const chapterCount = track?.modules.reduce((count, module) => count + (module.chapters?.length || 0), 0) || 0;
+  const advancedCount = track?.modules.reduce(
+    (count, module) => count + (module.chapters?.filter((chapter) => chapter.level === "advanced").length || 0),
+    0,
+  ) || 0;
+
+  function chooseCourse(course) {
+    selectCourse(course.slug);
+    navigate(`/tracks/${course.slug}`);
+  }
 
   return (
     <div className="marketing">
@@ -17,63 +41,70 @@ export default function Home() {
             <small>AI Academy</small>
           </span>
         </Link>
-        <nav>
-          <Link to="/tracks">Courses</Link>
-          <Link to="/studio">Developer studio</Link>
-          <Link to="/agents">Agents</Link>
-          <Link to="/lab">SQL lab</Link>
-        </nav>
-        <Link to="/signin" className="btn btn-gold btn-small">
-          Enter
-        </Link>
+        {track ? (
+          <nav>
+            <NavLink to={`/tracks/${track.slug}`}>My course</NavLink>
+            <NavLink to="/tracks">Switch course</NavLink>
+            <NavLink to="/agents">Course AI</NavLink>
+            {track.slug === "data-analytics" && <NavLink to="/lab">SQL lab</NavLink>}
+          </nav>
+        ) : (
+          <p className="course-selection-note">Choose one learning path to personalize your academy.</p>
+        )}
+        <Link to="/signin" className="btn btn-gold btn-small">Account</Link>
       </header>
 
-      <section className="hero">
+      <section className="hero course-home-hero">
         <div className="hero-copy">
           <p className="eyebrow">
-            <i className="pulse" /> Faculty of agents · {TRACKS.length} learning paths
+            <i className="pulse" />
+            {track ? `${track.index} · Your personal learning space` : "Start with one focused learning path"}
           </p>
           <h1>
-            Study with agents.
-            <em> Keep the proof.</em>
+            {track ? (
+              <>
+                {track.title}
+                <em> learning space.</em>
+              </>
+            ) : (
+              <>
+                One course.
+                <em> Your focus.</em>
+              </>
+            )}
           </h1>
           <p className="lede">
-            Excellent AI Academy is a course platform where specialist agents teach, drill, and
-            interview you across technology, data, design, and business. Grades come from the work
-            you submit, and unfinished modules stay marked as mapped.
+            {track
+              ? track.summary
+              : "Choose the course you want to focus on. The workspace will show its roadmap, progress, and course-specific AI coach. You can switch courses any time."}
           </p>
           <div className="hero-actions">
-            <Link className="btn btn-gold" to="/tracks">
-              Browse courses
-            </Link>
-            <Link className="btn btn-ghost" to="/agents">
-              Open the agent studio
-            </Link>
+            {track ? (
+              <>
+                <Link className="btn btn-gold" to={allComplete ? `/tracks/${track.slug}` : `/learn/${track.slug}/${nextIndex + 1}`}>
+                  {allComplete ? "Review my roadmap" : seen[`${track.slug}-${nextIndex + 1}`] ? "Continue learning" : "Start next module"}
+                  <Icon name="arrow" size={18} />
+                </Link>
+                <Link className="btn btn-ghost" to={`/tracks/${track.slug}`}>
+                  Open my roadmap
+                </Link>
+              </>
+            ) : (
+              <a className="btn btn-gold" href="#choose-course">Choose my course</a>
+            )}
           </div>
-          <dl className="stat-row">
-            <div>
-              <dt>{String(TRACKS.length).padStart(2, "0")}</dt>
-              <dd>Courses</dd>
-            </div>
-            <div>
-              <dt>{String(modules).padStart(2, "0")}</dt>
-              <dd>Modules listed</dd>
-            </div>
-            <div>
-              <dt>01</dt>
-              <dd>Lesson live</dd>
-            </div>
-            <div>
-              <dt>03</dt>
-              <dd>Graded SQL tasks</dd>
-            </div>
-          </dl>
+          {track && (
+            <dl className="stat-row course-home-stats">
+              <div><dt>{track.modules.length}</dt><dd>Modules</dd></div>
+              <div><dt>{chapterCount}</dt><dd>Chapters</dd></div>
+              <div><dt>{advancedCount}</dt><dd>Advanced topics</dd></div>
+              <div><dt>{completed}/{track.modules.length}</dt><dd>Completed</dd></div>
+            </dl>
+          )}
         </div>
-        <div className="stage" aria-hidden="true">
+        <div className="stage course-home-stage" aria-label="Academy faculty">
           <div className="stage-glow" />
-          <div className="stage-orb">
-            <span />
-          </div>
+          <div className="stage-orb"><span /></div>
           {AGENTS.map((agent) => (
             <article key={agent.id} className={`float tint-${agent.tint}`}>
               <header>
@@ -86,91 +117,67 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="band">
-        <div className="section-head">
-          <p className="eyebrow">Catalog</p>
-          <h2>{TRACKS.length} paths. One faculty.</h2>
-        </div>
-        <div className="track-grid">
-          {TRACKS.map((track) => (
-            <Link key={track.slug} to={`/tracks/${track.slug}`} className="track-card" data-accent={track.accent}>
-              <div className="track-top">
-                <span>{track.index}</span>
-                {track.signature && <em className="badge badge-live">Signature</em>}
+      {track ? (
+        <section className="band selected-course-content">
+          <div className="selected-course-layout">
+            <article className="panel next-step-card">
+              <p className="kicker">Recommended next step</p>
+              <h2>{allComplete ? "All course modules completed" : nextModule?.title || "Your course roadmap"}</h2>
+              <p className="muted">
+                {allComplete ? "Review your work or revisit an advanced chapter." : nextModule?.points?.[0] || "Open your roadmap to choose a module and continue your learning."}
+              </p>
+              <Link className="btn btn-gold" to={allComplete ? `/tracks/${track.slug}` : `/learn/${track.slug}/${nextIndex + 1}`}>
+                {allComplete ? "Review my roadmap" : `Open module ${String(nextIndex + 1).padStart(2, "0")}`}
+              </Link>
+            </article>
+            <article className="panel course-progress-card">
+              <p className="kicker">Your progress</p>
+              <p className="course-progress-count">{completed}<span> / {track.modules.length}</span></p>
+              <p className="muted">modules completed in {track.title}</p>
+              <div className="bar" role="progressbar" aria-label={`${track.title} completion`} aria-valuenow={completed} aria-valuemin={0} aria-valuemax={track.modules.length}>
+                <i style={{ width: `${track.modules.length ? Math.round((completed / track.modules.length) * 100) : 0}%` }} />
               </div>
-              <h3>{track.title}</h3>
-              <p>{track.summary}</p>
-              <footer>
-                <span>{track.modules.length} modules</span>
-                <span>{track.modules.filter((mod) => mod.status === "live").length} live</span>
-              </footer>
+              <Link to="/dashboard" className="text-btn">View my progress</Link>
+            </article>
+          </div>
+          <div className="course-home-actions">
+            <Link to="/agents" className="panel course-home-action">
+              <span className="feature-icon"><Icon name="ai" size={21} /></span>
+              <span className="kicker">Course-specific AI</span>
+              <strong>Ask {track.assistant.name}</strong>
+              <span className="muted">{track.assistant.role}</span>
             </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="band split-band">
-        <div>
-          <p className="eyebrow">How a session works</p>
-          <h2>An agent has a job, and the lab has a key.</h2>
-          <ol className="steps">
-            <li>
-              <strong>Atlas</strong> points you at the live lesson instead of a module that is only a title.
-            </li>
-            <li>
-              <strong>Mira</strong> teaches SELECT, JOIN, and GROUP BY from the published SQL lesson.
-            </li>
-            <li>
-              <strong>Quill</strong> hints at your query. The grader compares results, so a lucky sentence cannot pass.
-            </li>
-            <li>
-              <strong>Vega</strong> asks one interview question. <strong>Herald</strong> keeps the completion record closed until the work exists.
-            </li>
-          </ol>
-        </div>
-        <aside className="preview panel">
-          <p className="kicker">Studio preview · Mira</p>
-          <p className="bubble agent">
-            WHERE runs before grouping. If you want rows where the total is large, that filter is HAVING, because the total does not exist at WHERE time.
-          </p>
-          <p className="bubble user">Why did my city count include Delhi?</p>
-          <p className="bubble agent">
-            COUNT of customers by city keeps every city until HAVING says “more than one”. Delhi has one customer, so it drops.
-          </p>
-          <Link to="/agents" className="text-btn">
-            Talk to the faculty
-          </Link>
-        </aside>
-      </section>
-
-      <section className="band roadmap">
-        <div className="section-head">
-          <p className="eyebrow">What is open today</p>
-          <h2>The map is wide. The classroom is honest.</h2>
-        </div>
-        <div className="road-grid">
-          <article className="panel">
-            <span className="badge badge-live">Live</span>
-            <h3>SQL fundamentals</h3>
-            <p>A full lesson, source links, and three tasks graded against hidden reference results.</p>
-          </article>
-          <article className="panel">
-            <span className="badge badge-soon">In the studio</span>
-            <h3>Five faculty agents</h3>
-            <p>Tutor, coach, interviewer, planner, and records. They answer from the published curriculum on this device.</p>
-          </article>
-          <article className="panel">
-            <span className="badge badge-soon">Mapped</span>
-            <h3>The other modules</h3>
-            <p>Titles are in the catalog. Lesson text, quizzes, and projects for those rooms are still in production.</p>
-          </article>
-        </div>
-      </section>
-
-      <footer className="market-foot">
-        <Mark size={22} />
-        <p>Excellent AI Academy · a course completion record is a school credential, separate from a university degree.</p>
-      </footer>
+            {track.slug === "data-analytics" && (
+              <Link to="/lab" className="panel course-home-action">
+                <span className="feature-icon"><Icon name="lab" size={21} /></span>
+                <span className="kicker">Hands-on practice</span>
+                <strong>Open the SQL lab</strong>
+                <span className="muted">Run and submit graded SQL tasks.</span>
+              </Link>
+            )}
+            <Link to="/tracks" className="panel course-home-action switch-course-action">
+              <span className="feature-icon"><Icon name="switch" size={21} /></span>
+              <span className="kicker">Your choice can change</span>
+              <strong>Switch course</strong>
+              <span className="muted">Your progress stays saved in this browser.</span>
+            </Link>
+          </div>
+          <footer className="market-foot">
+            <Mark size={22} />
+            <p>Your selected course and learning progress are saved in this browser.</p>
+          </footer>
+        </section>
+      ) : (
+        <section className="band course-onboarding" id="choose-course">
+          <div className="section-head">
+            <p className="eyebrow">Choose your learning path</p>
+            <h2>Pick one course to personalize your workspace.</h2>
+            <p className="muted">Only your selected course appears in your learning space. You can switch whenever you want.</p>
+          </div>
+          <CourseChooser onChoose={chooseCourse} />
+          <p className="course-storage-note">Selection is saved on this browser, not synced to your account or other devices.</p>
+        </section>
+      )}
     </div>
   );
 }
