@@ -10,6 +10,20 @@ def test_grader():
     assert grade("sql-1","SELECT name FROM customers WHERE city='Kochi' ORDER BY name")["passed"]
     assert not grade("sql-1","SELECT name FROM customers")["passed"]
     assert not grade("sql-1","DROP TABLE customers")["passed"]
+def test_registration_persists_normalized_account_with_hashed_password():
+    email=f"{uuid.uuid4().hex}@example.test"
+    password="password1"
+    response=c.post("/auth/register",json={"email":f" {email.upper()} ","name":"  Learner  ","password":password})
+    assert response.status_code==200
+    with academy.SessionLocal() as session:
+        user=session.scalar(select(academy.User).where(academy.User.email==email))
+        assert user is not None
+        assert user.name=="Learner"
+        assert user.password_hash!=password
+        assert academy.check_pw(password,user.password_hash)
+    assert c.post("/auth/register",json={"email":email,"name":"Learner","password":password}).status_code==409
+    assert c.post("/auth/login",json={"email":email.upper(),"password":password}).status_code==200
+
 def test_flow():
     email=f"{uuid.uuid4().hex}@example.test"
     r=c.post("/auth/register",json={"email":email,"name":"A","password":"password1"}); h={"Authorization":"Bearer "+r.json()["token"]}

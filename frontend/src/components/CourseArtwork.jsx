@@ -123,7 +123,7 @@ export default function CourseArtwork({ slug }) {
         <path d="M29.5 0v142M58.5 0v142M87.5 0v142M116.5 0v142M145.5 0v142M174.5 0v142M203.5 0v142M232.5 0v142M261.5 0v142" />
       </g>
       <text x="14" y="21" className="course-art-title">{diagram.title}</text>
-      <g fill="none" stroke={diagram.accent} strokeOpacity="0.72" strokeWidth="1.15">
+      <g className="course-art-connections" fill="none" stroke={diagram.accent} strokeOpacity="0.72" strokeWidth="1.15">
         <path d="M85 76h20m74 0h20" />
         <path d="m101 72 4 4-4 4m74-8 4 4-4 4" />
       </g>
@@ -133,7 +133,15 @@ export default function CourseArtwork({ slug }) {
         return (
           <g key={label}>
             <rect className="course-art-node" x={x} y="49" width="74" height="55" rx="10" />
-            <circle className="course-art-node-light" cx={x + 12} cy="62" r="2.3" fill={diagram.accent} filter={`url(#art-glow-${slug})`} />
+            <circle
+              className="course-art-node-light"
+              cx={x + 12}
+              cy="62"
+              r="2.3"
+              fill={diagram.accent}
+              filter={`url(#art-glow-${slug})`}
+              style={{ "--art-delay": `${index * 220}ms` }}
+            />
             <StageGlyph type={diagram.glyphs[index]} x={x + 48} y={55} color={diagram.accent} />
             <text x={x + 9} y="78" className="course-art-stage">{label}</text>
             <text x={x + 9} y="92" className="course-art-detail">{detail}</text>

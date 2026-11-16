@@ -12,6 +12,10 @@ export default function Auth() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const emailReady = form.email.trim().includes("@");
+  const passwordReady = form.password.length >= 8;
+  const nameReady = form.name.trim().length >= 2;
+  const canSubmit = emailReady && passwordReady && (mode !== "register" || nameReady);
 
   function changeMode(nextMode) {
     setMode(nextMode);
@@ -25,15 +29,15 @@ export default function Auth() {
   async function submit(event) {
     event.preventDefault();
     setError("");
-    if (!form.email.includes("@")) {
+    if (!emailReady) {
       setError("Use an email address.");
       return;
     }
-    if (form.password.length < 8) {
+    if (!passwordReady) {
       setError("Use a password of at least 8 characters.");
       return;
     }
-    if (mode === "register" && form.name.trim().length < 2) {
+    if (mode === "register" && !nameReady) {
       setError("Add the name that should appear on a record.");
       return;
     }
@@ -93,7 +97,7 @@ export default function Auth() {
             {mode === "register" && (
               <label className="field" htmlFor="auth-name">
                 <span>Name</span>
-                <input id="auth-name" name="name" value={form.name} onChange={update} placeholder="How should we address you?" autoComplete="name" required />
+                <input id="auth-name" name="name" value={form.name} onChange={update} placeholder="How should we address you?" autoComplete="name" minLength={2} required />
               </label>
             )}
             <label className="field" htmlFor="auth-email">
@@ -126,7 +130,7 @@ export default function Auth() {
               </p>
             )}
             {error && <p className="fail-text" role="alert">{error}</p>}
-            <button className="btn btn-gold auth-submit" type="submit" disabled={busy || !online}>
+            <button className="btn btn-gold auth-submit" type="submit" disabled={busy || !online || !canSubmit}>
               {busy ? "Working…" : mode === "register" ? "Create my account" : "Sign in"}
               {!busy && <span aria-hidden="true">→</span>}
             </button>

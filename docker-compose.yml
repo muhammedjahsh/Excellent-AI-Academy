@@ -1,14 +1,15 @@
 services:
-  db:
-    image: postgres:16
-    environment: {POSTGRES_PASSWORD: dev, POSTGRES_DB: dataverse}
   api:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql://postgres:dev@db/dataverse
+      DATABASE_URL: sqlite:////data/dataverse.db
       JWT_SECRET: change-me
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
     ports: ["8000:8000"]
-    depends_on: [db]
+    volumes:
+      - academy-data:/data
+
+volumes:
+  academy-data:

@@ -104,7 +104,38 @@ export default function Home() {
         </div>
         <div className="stage course-home-stage" aria-label="Academy faculty">
           <div className="stage-glow" />
+          <div className="stage-constellation" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </div>
           <div className="stage-orb"><span /></div>
+          <div className="stage-model" aria-hidden="true">
+            <div className="academy-cube">
+              <div className="cube-face cube-front">
+                <span className="cube-emblem">EA</span>
+                <strong>LEARN</strong>
+                <small>01 / EXPLORE</small>
+              </div>
+              <div className="cube-face cube-right">
+                <span className="cube-emblem">{"{ }"}</span>
+                <strong>BUILD</strong>
+                <small>02 / CREATE</small>
+              </div>
+              <div className="cube-face cube-back">
+                <span className="cube-emblem">AI</span>
+                <strong>THINK</strong>
+                <small>03 / DISCOVER</small>
+              </div>
+              <div className="cube-face cube-left">
+                <span className="cube-emblem">↗</span>
+                <strong>GROW</strong>
+                <small>04 / ADVANCE</small>
+              </div>
+              <div className="cube-face cube-top"><i /><i /><i /></div>
+              <div className="cube-face cube-bottom" />
+            </div>
+          </div>
           {AGENTS.map((agent) => (
             <article key={agent.id} className={`float tint-${agent.tint}`}>
               <header>
@@ -173,6 +204,29 @@ export default function Home() {
             <p className="eyebrow">Choose your learning path</p>
             <h2>Pick one course to personalize your workspace.</h2>
             <p className="muted">Only your selected course appears in your learning space. You can switch whenever you want.</p>
+          </div>
+          <div className="learning-visual-grid" aria-label="A look inside the academy">
+            <figure className="learning-visual-tile">
+              <img src="/images/collaborative-learning.jpg" alt="Learners collaborating around a laptop" width="960" height="640" loading="lazy" />
+              <figcaption>
+                <span>01 / LEARN TOGETHER</span>
+                <strong>Curiosity grows in good company.</strong>
+              </figcaption>
+            </figure>
+            <figure className="learning-visual-tile">
+              <img src="/images/learning-analytics.jpg" alt="An analytics dashboard displaying charts and metrics" width="960" height="640" loading="lazy" />
+              <figcaption>
+                <span>02 / FIND THE SIGNAL</span>
+                <strong>Turn data into clear decisions.</strong>
+              </figcaption>
+            </figure>
+            <figure className="learning-visual-tile">
+              <img src="/images/coding-workspace.jpg" alt="Code open on a laptop in a bright workspace" width="960" height="640" loading="lazy" />
+              <figcaption>
+                <span>03 / MAKE IT REAL</span>
+                <strong>Build projects you can show.</strong>
+              </figcaption>
+            </figure>
           </div>
           <CourseChooser onChoose={chooseCourse} />
           <p className="course-storage-note">Selection is saved on this browser, not synced to your account or other devices.</p>

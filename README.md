@@ -1,4 +1,4 @@
-# DataVerse AI Academy: vertical slice
+# Excellent AI Academy: vertical slice
 
 **Implemented:** register/login (JWT, PBKDF2), a catalog of 10 learning paths, and tool-based advanced roadmaps
 for Data Analytics and the other courses. Every course has a course-specific, on-device curriculum coach; no external AI model

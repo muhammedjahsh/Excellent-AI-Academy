@@ -4,7 +4,8 @@ from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.security import HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, DateTime, UniqueConstraint, func, select
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, DateTime, UniqueConstraint, func, inspect, select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from .curriculum import TRACKS, LESSON
 from .grader import TASKS, grade
@@ -14,12 +15,13 @@ STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 COURSE_PRICE_PAISE = 1_000_000
-engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///./dataverse.db"))
-SessionLocal = sessionmaker(engine); Base = declarative_base()
+database_url = os.getenv("DATABASE_URL", "sqlite:///./dataverse.db")
+engine = create_engine(database_url, connect_args={"check_same_thread": False} if database_url.startswith("sqlite") else {})
+SessionLocal = sessionmaker(bind=engine); Base = declarative_base()
 
 class User(Base):
-    __tablename__="users"; id=Column(Integer,primary_key=True); email=Column(String,unique=True,index=True)
-    name=Column(String); pw=Column(String); role=Column(String,default="learner")
+    __tablename__="users"; id=Column(Integer,primary_key=True); email=Column(String,unique=True,index=True,nullable=False)
+    name=Column(String,nullable=False); password_hash=Column(String,nullable=False); role=Column(String,default="learner",nullable=False)
 class Attempt(Base):
     __tablename__="attempts"; id=Column(Integer,primary_key=True); user_id=Column(Integer,index=True)
     task_id=Column(String,index=True); query=Column(String); passed=Column(Boolean); score=Column(Float); at=Column(DateTime,server_default=func.now())
@@ -36,6 +38,10 @@ class Enrollment(Base):
     order_id=Column(String); enrolled=Column(DateTime,server_default=func.now())
     __table_args__=(UniqueConstraint("user_id","track",name="uq_enrollment_user_track"),)
 Base.metadata.create_all(engine)
+with engine.begin() as connection:
+    user_columns = {column["name"] for column in inspect(connection).get_columns("users")}
+    if "pw" in user_columns and "password_hash" not in user_columns:
+        connection.execute(text("ALTER TABLE users RENAME COLUMN pw TO password_hash"))
 
 app = FastAPI(title="DataVerse AI Academy"); bearer = HTTPBearer()
 def db():
@@ -90,13 +96,23 @@ def require_enrollment(u:User,slug:str,s:Session):
 @app.post("/auth/register")
 def register(r:Reg, s:Session=Depends(db)):
     if len(r.password)<8: raise HTTPException(422,"Password must be 8+ characters")
-    if s.scalar(select(User).where(User.email==r.email.lower())): raise HTTPException(409,"Email exists")
-    u=User(email=r.email.lower(),name=r.name,pw=hash_pw(r.password)); s.add(u); s.commit()
+    email=r.email.strip().lower()
+    name=r.name.strip()
+    if not email or not name: raise HTTPException(422,"Name and email are required")
+    if s.scalar(select(User).where(User.email==email)): raise HTTPException(409,"Email exists")
+    u=User(email=email,name=name,password_hash=hash_pw(r.password)); s.add(u)
+    try:
+        s.commit()
+    except IntegrityError:
+        s.rollback()
+        if s.scalar(select(User.id).where(User.email==email)):
+            raise HTTPException(409,"Email exists")
+        raise
     return {"token":token(u.id)}
 @app.post("/auth/login")
 def login(r:Login, s:Session=Depends(db)):
-    u=s.scalar(select(User).where(User.email==r.email.lower()))
-    if not u or not check_pw(r.password,u.pw): raise HTTPException(401,"Bad credentials")
+    u=s.scalar(select(User).where(User.email==r.email.strip().lower()))
+    if not u or not check_pw(r.password,u.password_hash): raise HTTPException(401,"Bad credentials")
     return {"token":token(u.id)}
 
 @app.get("/billing/catalog")
