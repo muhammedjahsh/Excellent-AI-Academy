@@ -1,8 +1,9 @@
 # Excellent AI Academy: vertical slice
 
 **Implemented:** register/login (JWT, PBKDF2), a catalog of 10 learning paths, and tool-based advanced roadmaps
-for Data Analytics and the other courses. Every course has a course-specific, on-device curriculum coach; no external AI model
-is configured or receives learner prompts. Data Analytics Module 2 SQL lesson with source links, SQL lab with 3 tasks graded deterministically against hidden reference
+for Data Analytics and the other courses. Every course has a course-specific, on-device curriculum coach, and the
+academy-wide guide answers from local course and website information; no external AI model is configured or receives learner prompts.
+Every module has five project briefs and each course has an integrated major project. Data Analytics Module 2 SQL lesson with source links, SQL lab with 3 tasks graded deterministically against hidden reference
 results (SELECT-only, subprocess, 5s timeout), stored attempts, certificate eligibility/issue/public-verify endpoints
 (issuance is correctly blocked until all requirements exist), and a Stripe Checkout enrollment flow. Checkout and payment
 verification are covered with mocked Stripe API tests; live payments require private Stripe credentials. Courses are
@@ -15,7 +16,7 @@ The SQL lab and certificate operations also verify enrollment in the API. Course
 so move paid lesson content behind authenticated server routes before using the UI gate to protect confidential materials.
 
 **Not implemented yet:** hosted AI tutor and retrieval/citations, LLM provider layer, quiz engine, Python lab, mock interviews,
-projects, adaptive plans, gamification, PDF/QR certificates, admin/instructor console, content for the other ~70 modules.
+project execution/submission and grading, adaptive plans, gamification, PDF/QR certificates, admin/instructor console, content for the other ~70 modules.
 Module content status is reported honestly as `planned`.
 
 **Security caveat:** the SQL runner is a subprocess with an authorizer, which is fine for local dev. Before exposing publicly,
@@ -28,6 +29,7 @@ This is a learning convenience, not a security sandbox. Drafts are stored in the
 ## Run
     cd backend && pip install -r requirements.txt && uvicorn app.main:app --reload   # SQLite, http://localhost:8000
     cd frontend && npm install && npm run dev                                     # Vite, http://localhost:5173
+    cd frontend && npm run check:assistant                                        # Academy Guide checks
     pytest                                                                          # tests
     docker compose up --build                                                       # PostgreSQL
 Set `JWT_SECRET` in any real deployment. API docs at `/docs`.

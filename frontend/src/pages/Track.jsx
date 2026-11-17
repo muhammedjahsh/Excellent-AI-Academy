@@ -8,10 +8,13 @@ import { useTitle } from "../hooks/useTitle";
 export default function Track() {
   const { slug } = useParams();
   const track = getTrack(slug);
-  const { activeCourse, done, seen } = useAcademy();
+  const { activeCourse, done, seen, enrollments, selectCourse, user } = useAcademy();
   const activeTrack = getTrack(activeCourse);
+  const enrolled = enrollments.includes(track?.slug);
+  const selected = activeCourse === track?.slug;
+  const lessonsAvailable = enrolled && selected;
   const [query, setQuery] = useState("");
-  useTitle(track?.slug === activeCourse ? track.title : activeTrack?.title || "Choose a course");
+  useTitle(track?.title || activeTrack?.title || "Choose a course");
 
   const modules = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -22,6 +25,7 @@ export default function Track() {
           mod.title,
           ...(mod.tools || []),
           ...(mod.chapters || []).map((chapter) => chapter.title),
+          ...(mod.projects || []).flatMap((project) => [project.title, project.brief]),
           mod.project,
           mod.challenge,
         ].join(" ").toLowerCase();
@@ -29,27 +33,11 @@ export default function Track() {
       });
   }, [query, track]);
 
-  if (!activeCourse) return <Navigate to="/tracks" replace />;
-
   if (!track) {
     return (
       <div className="page">
         <h1>That course is not on the map.</h1>
         <Link to="/tracks">Back to courses</Link>
-      </div>
-    );
-  }
-
-  if (track.slug !== activeCourse) {
-    return (
-      <div className="page">
-        <p className="eyebrow">Course access</p>
-        <h1>This workspace is focused on your selected course.</h1>
-        <p className="lede">To keep your learning space focused, open your selected course or switch courses first.</p>
-        <div className="hero-actions">
-          <Link className="btn btn-gold" to={`/tracks/${activeCourse}`}>Open my course</Link>
-          <Link className="btn btn-ghost" to="/tracks">Switch course</Link>
-        </div>
       </div>
     );
   }
@@ -72,6 +60,21 @@ export default function Track() {
         <p className="eyebrow">{track.index} · {track.path}</p>
         <h1>{track.title}</h1>
         <p className="lede">{track.summary}</p>
+        {!enrolled ? (
+          <div className="hero-actions">
+            <Link className="btn btn-gold" to={user?.token ? "/checkout" : "/signin"}>
+              {user?.token ? "Enroll to unlock lessons" : "Sign in to enroll"}
+            </Link>
+            <span className="muted">Syllabus preview · lessons and course tools require enrollment.</span>
+          </div>
+        ) : !selected ? (
+          <div className="hero-actions">
+            <button type="button" className="btn btn-gold" onClick={() => selectCourse(track.slug)}>
+              Make this my active course
+            </button>
+            <span className="muted">You are enrolled; select this course to start its lessons.</span>
+          </div>
+        ) : null}
       </header>
       <section className="roadmap-summary" aria-label="Course roadmap summary">
         <div><strong>{track.modules.length}</strong><span>tool-based modules</span></div>
@@ -80,12 +83,21 @@ export default function Track() {
         <div><strong>{completed}/{track.modules.length}</strong><span>modules completed</span></div>
       </section>
       <CourseCoach track={track} />
-      {track.project && (
+      {track.majorProject && (
         <section className="panel capstone-card">
-          <p className="kicker">Course capstone</p>
-          <h2>Put the full path together</h2>
-          <p>{track.project}</p>
-          <p className="muted"><strong>Stretch challenge:</strong> {track.challenge}</p>
+          <p className="kicker">Major project · integrates all {track.majorProject.modules.length} modules</p>
+          <h2>{track.majorProject.title}</h2>
+          <p>{track.majorProject.brief}</p>
+          <h3>Portfolio deliverables</h3>
+          <ul className="project-deliverables">
+            {track.majorProject.deliverables.map((deliverable) => <li key={deliverable}>{deliverable}</li>)}
+          </ul>
+          <details className="capstone-modules">
+            <summary>Show the modules this project brings together</summary>
+            <ol>
+              {track.majorProject.modules.map((module, index) => <li key={module}>{String(index + 1).padStart(2, "0")} · {module}</li>)}
+            </ol>
+          </details>
         </section>
       )}
       <label className="field roadmap-search">
@@ -102,20 +114,21 @@ export default function Track() {
           const n = mod.n;
           const id = `${track.slug}-${n}`;
           return (
-            <li key={id} className={`roadmap-module${mod.status === "live" ? " live" : ""}`}>
-              <Link to={`/learn/${track.slug}/${n}`} className="module-link">
-                <span className="n">{String(n).padStart(2, "0")}</span>
-                <span className="module-link-copy">
-                  <strong>{mod.title}</strong>
-                  <small>
-                    {mod.status === "live" ? "SQL fundamentals lesson and lab are open" : "Chapter roadmap · lesson content in production"}
-                    {done[id] ? " · complete" : seen[id] ? " · opened" : ""}
-                  </small>
-                </span>
-                <em className={mod.status === "live" ? "badge badge-live" : "badge badge-soon"}>
-                  {mod.status === "live" ? "SQL live" : "Roadmap"}
+            <li id={id} key={id} className={`roadmap-module${mod.status === "live" ? " live" : ""}`}>
+              {lessonsAvailable ? (
+                <Link to={`/learn/${track.slug}/${n}`} className="module-link">
+                  <ModuleHeading mod={mod} id={id} done={done} seen={seen} lessonsAvailable />
+                </Link>
+              ) : (
+                <div className="module-link module-link-preview">
+                  <ModuleHeading mod={mod} id={id} done={done} seen={seen} />
+                </div>
+              )}
+              {!lessonsAvailable && (
+                <em className="badge badge-soon module-preview-badge">
+                  {enrolled ? "Select course to learn" : "Syllabus preview"}
                 </em>
-              </Link>
+              )}
               {mod.tools?.length > 0 && (
                 <div className="tool-tags" aria-label="Tools covered">
                   {mod.tools.map((tool) => <span key={tool}>{tool}</span>)}
@@ -124,7 +137,7 @@ export default function Track() {
               {mod.chapters?.length > 0 && (
                 <details className="chapter-disclosure" open={Boolean(query)}>
                   <summary>
-                    {mod.chapters.length} chapters · {mod.chapters.filter((chapter) => chapter.level === "advanced").length} advanced
+                    {mod.chapters.length} chapters · {mod.chapters.filter((chapter) => chapter.level === "advanced").length} advanced · {mod.projects?.length || 0} project briefs
                   </summary>
                   <ol className="chapter-list">
                     {mod.chapters.map((chapter, chapterIndex) => (
@@ -139,6 +152,19 @@ export default function Track() {
                     <p><strong>Applied project:</strong> {mod.project}</p>
                     <p><strong>Challenge:</strong> {mod.challenge}</p>
                   </div>
+                  {mod.projects?.length === 5 && (
+                    <section className="module-project-ideas" aria-label={`${mod.title} project ideas`}>
+                      <h3>5 distinctive project briefs</h3>
+                      <ol>
+                        {mod.projects.map((project) => (
+                          <li key={project.title}>
+                            <strong>{project.title}</strong>
+                            <p>{project.brief}</p>
+                          </li>
+                        ))}
+                      </ol>
+                    </section>
+                  )}
                 </details>
               )}
             </li>
@@ -152,5 +178,24 @@ export default function Track() {
         </div>
       )}
     </div>
+  );
+}
+
+function ModuleHeading({ mod, id, done, seen, lessonsAvailable = false }) {
+  const n = mod.n;
+  return (
+    <>
+      <span className="n">{String(n).padStart(2, "0")}</span>
+      <span className="module-link-copy">
+        <strong>{mod.title}</strong>
+        <small>
+          {mod.status === "live" && lessonsAvailable ? "SQL fundamentals lesson and lab are open" : "Syllabus outline and project briefs"}
+          {done[id] ? " · complete" : seen[id] ? " · opened" : ""}
+        </small>
+      </span>
+      <em className={mod.status === "live" && lessonsAvailable ? "badge badge-live" : "badge badge-soon"}>
+        {mod.status === "live" && lessonsAvailable ? "SQL live" : "Roadmap"}
+      </em>
+    </>
   );
 }

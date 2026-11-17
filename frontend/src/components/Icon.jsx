@@ -5,6 +5,7 @@ const iconShapes = {
   lab: <><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" /><path d="M8 15h8" /></>,
   studio: <><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" /></>,
   ai: <><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="m19 16 .9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9z" /></>,
+  bot: <><circle cx="12" cy="3.5" r="1.25" /><path d="M12 4.75V7M5 11H3.5v4H5m14-4h1.5v4H19" /><rect x="5" y="7" width="14" height="13" rx="4" /><path d="M9 12h.01M15 12h.01M9.5 16h5" /></>,
   progress: <><path d="M4 19V5M4 19h17" /><path d="m7 15 4-4 3 2 6-7" /></>,
   records: <><path d="M6 3h12v18l-6-3-6 3z" /><path d="m9 10 2 2 4-4" /></>,
   payment: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 10h18M7 15h4" /></>,

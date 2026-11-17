@@ -6,12 +6,12 @@ import { useTitle } from "../hooks/useTitle";
 
 export default function Catalog() {
   const navigate = useNavigate();
-  const { activeCourse, selectCourse, clearCourseSelection, done } = useAcademy();
+  const { activeCourse, selectCourse, clearCourseSelection, done, enrollments } = useAcademy();
   const track = getTrack(activeCourse);
   useTitle(track ? "Switch course" : "Choose a course");
 
   function chooseCourse(course) {
-    selectCourse(course.slug);
+    if (enrollments.includes(course.slug)) selectCourse(course.slug);
     navigate(`/tracks/${course.slug}`);
   }
 
@@ -46,7 +46,7 @@ export default function Catalog() {
           <p className="eyebrow">{track ? "Available choices" : "Learning paths"}</p>
           <h2>{track ? "Change your focus when you’re ready." : "Select one path to get started."}</h2>
         </div>
-        <CourseChooser onChoose={chooseCourse} excludeSlug={track?.slug} />
+        <CourseChooser onChoose={chooseCourse} excludeSlug={track?.slug} enrolledCourses={enrollments} />
       </section>
       <p className="course-storage-note">Course selection and progress are stored on this browser and are not synced across devices.</p>
     </div>

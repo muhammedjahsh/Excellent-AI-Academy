@@ -644,12 +644,166 @@ const COURSE_PROFILES = {
   },
 };
 
+const MODULE_PROJECT_IDEAS = {
+  "data-analytics": [
+    { title: "Phantom Metric Forensics", brief: "Trace a business metric that changed after a source export, using {topic} to find the exact transformation behind the discrepancy; deliver a reproducible reconciliation log." },
+    { title: "Quiet-Signal Observatory", brief: "Build a way to surface a weak but consequential pattern in {topic} before it becomes obvious in a headline KPI; show the alert and its evidence." },
+    { title: "Counterfactual Decision Room", brief: "Recreate a real planning decision with {topic}, change one assumption, and show how the recommended action shifts without hiding uncertainty." },
+    { title: "Long-Tail Exception Atlas", brief: "Investigate rare records that ordinary summaries conceal in {topic}; deliver a small, explainable taxonomy of exceptions and their business impact." },
+    { title: "One-Page Evidence Contract", brief: "Turn {topic} into a compact handoff another analyst can independently reproduce, including definitions, quality checks, and one decision the evidence supports." },
+  ],
+  "data-science": [
+    { title: "The Missing-Week Observatory", brief: "Use {topic} to study a synthetic sensor network with irregular gaps, separating true events from collection failures and documenting uncertainty." },
+    { title: "Model Autopsy Archive", brief: "Create a reproducible investigation of a model failure in {topic}, tracing it from a surprising prediction back to a testable cause." },
+    { title: "Counterfactual Triage Desk", brief: "Prototype a {topic} workflow that compares plausible alternate outcomes for a high-stakes decision without presenting correlation as causation." },
+    { title: "Drift Before Dawn", brief: "Build a small {topic} monitor for an emerging population shift, then specify when the evidence is too weak to trigger action." },
+    { title: "The Uncertainty Receipt", brief: "Design a {topic} result card that exposes confidence, known blind spots, and the next measurement that would most reduce uncertainty." },
+  ],
+  "data-engineering": [
+    { title: "Schema-Change Escape Room", brief: "Use {topic} to ingest a source that changes shape mid-run; make the pipeline detect, quarantine, and safely replay affected records." },
+    { title: "The Backfill Ledger", brief: "Build a {topic} workflow for correcting a year of late-arriving events while proving that retries do not duplicate or erase facts." },
+    { title: "Cold-Start Data Cooperative", brief: "Design a {topic} path for a new data source with no trusted history, including a quarantine lane and a measurable promotion rule." },
+    { title: "Lineage Time Machine", brief: "Use {topic} to reconstruct which downstream outputs depend on one altered source field and produce a safe, ordered recovery plan." },
+    { title: "The Budget-Aware Replay", brief: "Create a {topic} replay strategy that restores a delayed feed under a fixed compute budget and reports the freshness-versus-cost trade-off." },
+  ],
+  "ai-engineering": [
+    { title: "Citation Fracture Lab", brief: "Use {topic} to build a test case where a plausible answer is unsupported by its sources, then make the failure visible and measurable." },
+    { title: "The Permission-Bound Assistant", brief: "Prototype a {topic} workflow whose tools expose only a narrow, auditable action and require human approval at its riskiest boundary." },
+    { title: "Dialect Drift Translator", brief: "Design a {topic} assistant for two specialized vocabularies and test whether it asks for clarification instead of confidently merging meanings." },
+    { title: "Multimodal Evidence Trail", brief: "Build a {topic} demonstration that connects non-text input to a traceable answer while preserving source references and uncertainty." },
+    { title: "The Regression Museum", brief: "Curate a small {topic} evaluation set from memorable failure cases and show how a proposed improvement changes both quality and risk." },
+  ],
+  "mern-stack": [
+    { title: "The Borrowed-Device Handoff", brief: "Build a {topic} flow for a shared public device, making session ownership, safe handoff, and unsaved-work recovery explicit." },
+    { title: "The Idempotent Promise", brief: "Create a {topic} feature where a double-click, retry, or stale tab cannot silently create duplicate real-world actions." },
+    { title: "The Consent Receipt", brief: "Design a {topic} experience that records what a user agreed to, what changed later, and how the decision can be reviewed." },
+    { title: "The Slow-Network Bazaar", brief: "Prototype a {topic} workflow that remains understandable through delayed responses, partial results, and a recoverable connection loss." },
+    { title: "The Permission Maze", brief: "Use {topic} to model a multi-role workspace and demonstrate that a user cannot infer or change another role's private records." },
+  ],
+  "flutter-development": [
+    { title: "The No-Signal Field Kit", brief: "Build a {topic} feature for a field worker who may be offline for a full shift, with queued actions and visible sync state." },
+    { title: "The One-Handed Transit Flow", brief: "Prototype a {topic} task for someone in motion, then test reachability, interruption recovery, and accessible alternatives." },
+    { title: "The Battery-Sparing Companion", brief: "Create a {topic} experience for a low-power device and document which background work can be deferred without losing user trust." },
+    { title: "The Shared-Tablet Checkpoint", brief: "Design a {topic} flow for rotating users on one device, protecting local data and making account handoff unambiguous." },
+    { title: "The Locale-Shift Journal", brief: "Use {topic} to handle a journey across time zones and language settings without corrupting dates, units, or saved progress." },
+  ],
+  "business-analyst": [
+    { title: "The Invisible Queue", brief: "Use {topic} to uncover work that never appears in the official process map, then define evidence that would confirm the hidden wait." },
+    { title: "The Conflicting-Clock Brief", brief: "Create a {topic} decision record for stakeholders who measure success on incompatible time horizons, with assumptions and trade-offs exposed." },
+    { title: "The Exception-First Service Map", brief: "Model a {topic} service around its rare but costly exceptions rather than its happy path, then prioritize a measurable improvement." },
+    { title: "The Reversible Decision Pack", brief: "Use {topic} to distinguish a reversible pilot from an irreversible commitment and specify a signal that should stop the work." },
+    { title: "The Evidence-to-Backlog Bridge", brief: "Turn {topic} research into traceable, testable work while preserving links from each recommendation to its evidence and owner." },
+  ],
+  "cloud-devops": [
+    { title: "The Midnight Region Loss", brief: "Use {topic} to rehearse losing one deployment region, including a safe failover, a cost boundary, and a tested return path." },
+    { title: "The Expiring-Credential Drill", brief: "Build a {topic} exercise where credentials expire during a release and recovery does not require copying secrets into a build log." },
+    { title: "The Carbon-and-Cost Scheduler", brief: "Design a {topic} workload policy that shifts flexible work against a fixed latency target, reporting both spend and energy trade-offs." },
+    { title: "The Noisy-Alert Triage", brief: "Use {topic} to turn an alert storm into a short evidence-led incident timeline with one actionable signal and a rollback criterion." },
+    { title: "The Rebuildable Platform Slice", brief: "Create a {topic} deployment slice that can be recreated from versioned inputs and prove recovery without relying on undocumented console state." },
+  ],
+  "ui-ux-design": [
+    { title: "The Quiet-Route Finder", brief: "Use {topic} to help a sensory-sensitive visitor choose a route through a busy public space, with uncertainty and accessibility preferences visible." },
+    { title: "The Consentful Research Loop", brief: "Design a {topic} research interaction that lets participants revise consent, skip sensitive questions, and see how their input is used." },
+    { title: "The Interrupted-Journey Map", brief: "Prototype a {topic} task that can be paused and resumed across devices without forcing users to remember hidden progress." },
+    { title: "The Low-Vision Contrast Audit", brief: "Create a {topic} artifact that reveals where color, density, or motion blocks a task and tests a non-visual alternative." },
+    { title: "The Trust-Repair Prototype", brief: "Use {topic} to redesign a confusing error state so users understand what happened, what was saved, and how to recover safely." },
+  ],
+  cybersecurity: [
+    { title: "The Canary-Account Timeline", brief: "Use {topic} with synthetic logs to reconstruct how a planted test identity moved through a defensive environment and which control should have interrupted it." },
+    { title: "The Forgotten-Asset Census", brief: "Create a {topic} inventory exercise for a fictional organization and prioritize unknown assets by exposure and business impact." },
+    { title: "The Evidence-Preserving Containment", brief: "Build a {topic} incident runbook that isolates a simulated compromised service while preserving a defensible evidence timeline." },
+    { title: "The Policy-to-Packet Trace", brief: "Use {topic} to connect one written security control to a verifiable defensive signal and record where the control cannot be proven." },
+    { title: "The Recovery-Without-Guessing Drill", brief: "Design a {topic} tabletop for restoring a fictional service from known-good inputs, with clear stop conditions and verification evidence." },
+  ],
+};
+
+const COURSE_CAPSTONES = {
+  "data-analytics": {
+    title: "The Shadow Ledger: A neighborhood change observatory",
+    brief: "Build an evidence trail from messy public-service and small-business data to a decision-ready view of how a neighborhood is changing. Integrate spreadsheet reconciliation, SQL analysis, reproducible code, governed BI, warehouse design, reliable pipelines, and a verified AI-assisted narrative.",
+    deliverables: ["A documented, refreshable data pipeline and quality checks", "A metric dictionary with SQL and reproducible analysis", "A role-aware dashboard with a cost and privacy note", "A short decision brief that separates evidence from uncertainty"],
+  },
+  "data-science": {
+    title: "The Missing-Week Observatory: Forecasting service pressure fairly",
+    brief: "Create a reproducible early-warning study for a fictional city service whose demand shifts seasonally and whose sensor coverage is uneven. Connect problem framing, data preparation, inference, feature design, model comparison, time-series analysis, language signals, deep learning, fairness, explainability, deployment, and monitoring.",
+    deliverables: ["A leakage-resistant experiment with a simple baseline", "A model card covering uncertainty, fairness, and known blind spots", "A small prediction service with drift checks", "A research note defending what the model should not decide"],
+  },
+  "data-engineering": {
+    title: "The Black-Start Data Cooperative: Recoverable civic data exchange",
+    brief: "Design a fictional multi-agency data platform that can recover after a source outage, schema change, and late event burst. Integrate architecture, ingestion, relational and non-relational stores, formats, transformation, orchestration, streaming, lakehouse and warehouse modeling, cloud operations, quality, governance, and optimization.",
+    deliverables: ["A versioned batch-and-streaming architecture with lineage", "A replay and backfill plan proving idempotency", "Automated data contracts, freshness checks, and incident signals", "A recovery demo with an explicit compute-cost budget"],
+  },
+  "ai-engineering": {
+    title: "The Evidence-Bound Public Service Navigator",
+    brief: "Build a scoped assistant over fictional public-service documents that must cite current evidence, ask when policy is ambiguous, and hand off sensitive actions to a person. Integrate data preparation, model and prompt fundamentals, APIs, embeddings, retrieval, evaluation, fine-tuning choices, multimodal inputs, application design, bounded agents, security, operations, and deployment.",
+    deliverables: ["A retrieval assistant with traceable citations and abstention behavior", "An evaluation set built from realistic failure cases", "A permission-limited tool flow with human approval", "A deployment and monitoring plan covering privacy and regressions"],
+  },
+  "mern-stack": {
+    title: "The Repair Commons: A trusted neighborhood repair exchange",
+    brief: "Ship a full-stack service where neighbors offer repair skills, coordinate shared tools, and record consent without exposing private contact details. Integrate accessible web foundations, typed React UI, routing and forms, Node and Express APIs, data modeling, authorization, testing, delivery, monitoring, and responsible AI assistance.",
+    deliverables: ["A working responsive application with documented API contracts", "A role and privacy model exercised by automated tests", "A recoverable booking flow that handles retries and conflicts", "A deployable release with accessibility and performance evidence"],
+  },
+  "flutter-development": {
+    title: "The Offline Field Atlas: A resilient community response app",
+    brief: "Build a mobile field tool for a volunteer team working through intermittent connectivity, shared devices, and changing local conditions. Integrate Dart, Flutter UI, responsive design, navigation, state, APIs, offline persistence, Firebase services, testing, accessibility, performance, and release operations.",
+    deliverables: ["An offline-first workflow with explicit sync and conflict states", "Secure shared-device handoff and local data handling", "Automated tests for interrupted and resumed tasks", "A staged release plan with accessibility and crash monitoring"],
+  },
+  "business-analyst": {
+    title: "The Invisible Queue: Redesigning a delayed community service",
+    brief: "Investigate a fictional service whose official process looks fast while applicants experience hidden waits and repeated requests. Integrate stakeholder discovery, elicitation, requirements, process analysis, SQL and spreadsheet evidence, KPI design, agile planning, prototyping, UAT, risk, and benefits measurement.",
+    deliverables: ["A research-backed current and future state process map", "Traceable requirements and acceptance criteria", "A prototype and risk-based UAT plan", "A business case with measurable outcomes and a decision log"],
+  },
+  "cloud-devops": {
+    title: "The Black-Sky Release Platform: A recoverable public alert service",
+    brief: "Design a fictional public alert service that continues safely through a zone outage, noisy telemetry, and a compromised deployment credential. Integrate cloud architecture, Linux and networking, Git, containers, infrastructure as code, CI/CD, Kubernetes, secrets, observability, reliability, cost, security, and release practice.",
+    deliverables: ["A reproducible, policy-checked deployment path", "A tested failover and rollback exercise with SLO evidence", "An alert and incident timeline with a blameless review", "A cost and least-privilege report for the platform"],
+  },
+  "ui-ux-design": {
+    title: "The Quiet-Route Atlas: An accessible guide to overwhelming places",
+    brief: "Design a service that helps visitors with different sensory, mobility, and language needs choose a manageable route through a crowded civic venue. Integrate research, journey mapping, information architecture, interaction and visual systems, prototyping, usability tests, accessibility, handoff, and case-study storytelling.",
+    deliverables: ["Consentful research artifacts and a journey map", "A tested prototype with accessible route alternatives", "A reusable component and content pattern set", "A handoff-ready case study tied to observed outcomes"],
+  },
+  cybersecurity: {
+    title: "The Museum After-Hours Tabletop: Defend a fictional digital collection",
+    brief: "Build a safe defensive exercise for a fictional museum facing a suspicious account, an exposed cloud backup, and an urgent restoration deadline. Integrate risk, networking, operating systems, identity, hardening, threat modeling, monitoring, vulnerability management, incident response, cloud controls, governance, and responsible AI-assisted triage.",
+    deliverables: ["A threat model and prioritized control map", "Synthetic defensive telemetry and detection rationale", "An evidence-preserving response and recovery playbook", "A governance and privacy review with explicit exercise boundaries"],
+  },
+};
+
+function addModuleProjects(track, module) {
+  const topic = module.title.replace(/[()]/g, "").trim();
+  return {
+    ...module,
+    projects: MODULE_PROJECT_IDEAS[track.slug].map((idea) => ({
+      title: `${idea.title} — ${topic}`,
+      brief: idea.brief.replaceAll("{topic}", topic.toLowerCase()),
+    })),
+  };
+}
+
+function addMajorProject(track, modules) {
+  return {
+    ...COURSE_CAPSTONES[track.slug],
+    modules: modules.map((module) => module.title),
+  };
+}
+
 function enrichCourse(track) {
   const profile = COURSE_PROFILES[track.slug];
-  if (!profile) return track;
+  if (!profile) {
+    return {
+      ...track,
+      modules: track.modules.map((module) => addModuleProjects(track, module)),
+      majorProject: addMajorProject(track, track.modules),
+    };
+  }
   if (!profile.tools) {
-    track.assistant = profile.assistant;
-    return track;
+    return {
+      ...track,
+      assistant: profile.assistant,
+      modules: track.modules.map((module) => addModuleProjects(track, module)),
+      majorProject: addMajorProject(track, track.modules),
+    };
   }
 
   const modules = track.modules.map((module, index) => {
@@ -702,10 +856,11 @@ function enrichCourse(track) {
   return {
     ...track,
     path: `${modules.length} tool-based modules · foundation to advanced`,
-    modules,
     assistant: profile.assistant,
     project: profile.project,
     challenge: profile.challenge,
+    modules: modules.map((module) => addModuleProjects(track, module)),
+    majorProject: addMajorProject(track, modules),
   };
 }
 

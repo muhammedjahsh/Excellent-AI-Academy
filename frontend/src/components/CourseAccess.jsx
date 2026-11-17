@@ -3,12 +3,14 @@ import { Link, useParams } from "react-router-dom";
 import { useAcademy } from "../context/AcademyContext";
 import { getTrack } from "../data/curriculum";
 
-export default function CourseAccess({ children, courseSlug }) {
+export default function CourseAccess({ children, courseSlug, syllabusPreview = false }) {
   const { slug } = useParams();
   const { activeCourse, user, enrollments, enrollmentLoading, enrollmentError, refreshEnrollments } = useAcademy();
   const [retryError, setRetryError] = useState("");
   const requiredCourse = courseSlug || slug || activeCourse;
   const track = getTrack(requiredCourse);
+
+  if (syllabusPreview && track) return children;
 
   async function retry() {
     setRetryError("");

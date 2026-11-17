@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { TRACKS } from "../data/curriculum";
 import CourseArtwork from "./CourseArtwork";
 
-export default function CourseChooser({ onChoose, excludeSlug }) {
+export default function CourseChooser({ onChoose, excludeSlug, enrolledCourses = [] }) {
   const [query, setQuery] = useState("");
   const options = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -39,7 +39,7 @@ export default function CourseChooser({ onChoose, excludeSlug }) {
                 <span>{track.assistant.name} · course coach</span>
               </div>
               <button type="button" className="btn btn-ghost" onClick={() => onChoose(track)}>
-                {excludeSlug ? "Switch to this course" : "Choose this course"}
+                {enrolledCourses.includes(track.slug) ? "Open this course" : "View syllabus"}
               </button>
             </article>
           ))}

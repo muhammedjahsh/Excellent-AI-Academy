@@ -8,7 +8,7 @@ import { useTitle } from "../hooks/useTitle";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { activeCourse, selectCourse, done, seen } = useAcademy();
+  const { activeCourse, selectCourse, done, seen, enrollments } = useAcademy();
   const track = getTrack(activeCourse);
   useTitle(track?.title || "Choose a course");
 
@@ -27,7 +27,7 @@ export default function Home() {
   ) || 0;
 
   function chooseCourse(course) {
-    selectCourse(course.slug);
+    if (enrollments.includes(course.slug)) selectCourse(course.slug);
     navigate(`/tracks/${course.slug}`);
   }
 
@@ -228,7 +228,7 @@ export default function Home() {
               </figcaption>
             </figure>
           </div>
-          <CourseChooser onChoose={chooseCourse} />
+          <CourseChooser onChoose={chooseCourse} enrolledCourses={enrollments} />
           <p className="course-storage-note">Selection is saved on this browser, not synced to your account or other devices.</p>
         </section>
       )}

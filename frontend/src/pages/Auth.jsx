@@ -44,10 +44,10 @@ export default function Auth() {
     try {
       if (mode === "register") {
         await register(form);
-        navigate("/checkout");
+        navigate("/tracks");
       } else {
         const { courses } = await login(form);
-        navigate(courses.length ? "/" : "/checkout");
+        navigate(courses.length ? "/" : "/tracks");
       }
     } catch (err) {
       setError(err.message);
